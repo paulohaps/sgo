@@ -1,14 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0D1117">
-<title>SGO — Sistema de Gestão Operacional</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>SGO — Sistema de Gestão Operacional | Uni Internet</title>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
@@ -16,133 +11,51 @@
 </head>
 <body>
 
-<!-- ── LOADING ────────────────────────────────────────────── -->
 <div id="loadingOverlay">
   <div class="ld-ring"></div>
   <div class="ld-title">Processando dados</div>
   <div class="ld-sub">Sincronizando matriz operacional...</div>
 </div>
-
 <datalist id="regionaisDatalist"></datalist>
 
-<!-- ── DESKTOP NAVBAR ─────────────────────────────────────── -->
-<nav id="navbar">
-  <div class="nav-brand">
-    <div class="nav-logo">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+<aside id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <div class="nav-brand">
+      <div class="nav-logo">Uni</div>
+      <span class="nav-wordmark">SGO</span>
     </div>
-    <span class="nav-wordmark">SGO</span>
+    <button id="menu-toggle" class="menu-toggle">⋮</button>
   </div>
-  <div class="nav-sep"></div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" id="tab-dashboard"       onclick="App.switchTab('dashboard')">Matriz Operacional</button>
-    <button class="nav-tab"        id="tab-analise"         onclick="App.switchTab('analise')">
-      Análise Operacional
-      <span id="badgeAnalise" class="nav-badge hidden" style="background:var(--accent);">●</span>
+  
+  <div class="nav-tabs sidebar-menu">
+    <button class="nav-tab active" id="tab-dashboard" onclick="App.switchTab('dashboard')">
+      <span class="icon">📊</span><span class="lbl">Matriz Operacional</span>
+    </button>
+    <button class="nav-tab" id="tab-analise" onclick="App.switchTab('analise')">
+      <span class="icon">🧠</span><span class="lbl">Análise Operacional</span>
+      <span id="badgeAnalise" class="nav-badge hidden">●</span>
     </button>
     <button class="nav-tab" id="tab-pendentes" onclick="App.switchTab('pendentes')">
-      Cadastros Pendentes
+      <span class="icon">➕</span><span class="lbl">Novos Colaboradores</span>
       <span id="badgePendentes" class="nav-badge hidden">0</span>
     </button>
     <button class="nav-tab" id="tab-reclassificacao" onclick="App.switchTab('reclassificacao')">
-      Reclassificar IA
+      <span class="icon">🤖</span><span class="lbl">Reclassificar IA</span>
       <span id="badgeReclassificacao" class="nav-badge purple hidden">0</span>
     </button>
-    <button class="nav-tab" id="tab-config" onclick="App.switchTab('config')">Base de Equipes</button>
+    <button class="nav-tab" id="tab-config" onclick="App.switchTab('config')">
+      <span class="icon">⚙️</span><span class="lbl">Base de Equipes</span>
+    </button>
   </div>
-  <div class="nav-right">
-    <div class="nav-pill">
-      <div class="nav-dot live"></div>
-      <span id="statusText" style="font-family:var(--mono);font-size:10px;color:#484F58;">Aguardando</span>
-    </div>
-    <div class="nav-pill" id="clockEl" style="font-family:var(--mono);font-size:10px;color:#373E47;"></div>
-    <button id="darkBtn" onclick="App.toggleDark()" title="Alternar tema">🌙</button>
+  
+  <div class="sidebar-footer">
+    <div class="nav-pill"><div class="nav-dot live"></div><span id="statusText">Aguardando</span></div>
+    <div class="nav-pill" id="clockEl"></div>
   </div>
-</nav>
+</aside>
 
-<!-- ── MOBILE TOP BAR ─────────────────────────────────────── -->
-<div id="mobileTopBar">
-  <div class="mob-top-inner">
-    <div style="display:flex;align-items:center;gap:9px;">
-      <div class="nav-logo" style="width:28px;height:28px;">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-      </div>
-      <span class="mob-page-title" id="mobPageTitle">Matriz Operacional</span>
-    </div>
-    <div class="mob-status">
-      <div class="nav-dot live"></div>
-      <span id="mobStatusText" style="font-family:var(--mono);font-size:10px;color:#484F58;">Aguardando</span>
-      <button id="darkBtnMob" onclick="App.toggleDark()" style="width:36px;height:36px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.04);color:#6E7681;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;margin-left:6px;">🌙</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── MOBILE BOTTOM NAV ───────────────────────────────────── -->
-<div id="mobileBottomNav">
-  <div class="mob-nav-inner">
-    <button class="mob-nav-btn active" id="mob-tab-dashboard" onclick="App.switchTab('dashboard')">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-      <span class="mob-nav-lbl">Matriz</span>
-    </button>
-    <button class="mob-nav-btn" id="mob-tab-analise" onclick="App.switchTab('analise')">
-      <span id="mobBadgeAnalise" class="mob-nav-badge orange hidden">●</span>
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-      <span class="mob-nav-lbl">Análise</span>
-    </button>
-    <button class="mob-nav-btn" id="mob-tab-pendentes" onclick="App.switchTab('pendentes')">
-      <span id="mobBadgePendentes" class="mob-nav-badge hidden">0</span>
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-      <span class="mob-nav-lbl">Novos</span>
-    </button>
-    <button class="mob-nav-btn" id="mob-tab-reclassificacao" onclick="App.switchTab('reclassificacao')">
-      <span id="mobBadgeReclass" class="mob-nav-badge purple hidden">0</span>
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-      <span class="mob-nav-lbl">IA</span>
-    </button>
-    <button class="mob-nav-btn" id="mob-tab-config" onclick="App.switchTab('config')">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-      <span class="mob-nav-lbl">Equipes</span>
-    </button>
-  </div>
-</div>
-
-<!-- ── MOBILE FILTER SHEET ────────────────────────────────── -->
-<div id="mobileFilterSheet">
-  <div class="sheet-handle" onclick="App.closeMobileFilterSheet()"></div>
-  <div class="sheet-title">Filtros da Matriz</div>
-  <div style="display:flex;flex-direction:column;gap:14px;">
-    <div class="fgrp"><label class="flbl">Mês de Referência</label><input type="month" id="filterMonthMob" class="fctl" disabled></div>
-    <div class="fgrp">
-      <label class="flbl">Tipo de Equipe</label>
-      <select id="filterTypeMob" class="fctl" onchange="App.syncMobileFilters()">
-        <option value="ALL">Todos os Tipos</option>
-        <option value="INSTALAÇÃO CIDADE">Instalação Cidade</option>
-        <option value="TECNICO 12/36H">Plantão 12/36H</option>
-        <option value="SUPORTE MOTO">Suporte Moto</option>
-        <option value="RURAL">Rural</option>
-        <option value="FAZ TUDO">Faz Tudo</option>
-      </select>
-    </div>
-    <button class="btn btn-accent" onclick="App.applyFilters();App.closeMobileFilterSheet();" style="width:100%;padding:14px;font-size:14px;border-radius:12px;margin-top:4px;">Aplicar Filtros</button>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <button class="btn btn-outline" onclick="App.exportToExcel();App.closeMobileFilterSheet();" style="justify-content:center;padding:12px;">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        Excel
-      </button>
-      <button class="btn btn-purple" onclick="App.analyzeWithGemini();App.closeMobileFilterSheet();" style="justify-content:center;padding:12px;">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-        Gemini IA
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════
-     MAIN
-     ══════════════════════════════════════════════════════════ -->
 <div id="main">
 
-  <!-- ════ DASHBOARD ════ -->
   <div id="view-dashboard" class="view active">
     <div class="pg-hdr">
       <div>
@@ -152,80 +65,44 @@
       <div class="pg-meta" id="pageMetaDate"></div>
     </div>
 
-    <!-- Mobile upload -->
-    <div class="mob-upload-card">
-      <div class="mob-upload-inner">
-        <input type="file" id="fileInputMob" accept=".csv,.xls,.xlsx" onchange="App.parseFileWithWorker(event)">
-        <div class="up-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-        </div>
-        <div class="mob-upload-info">
-          <div class="mob-upload-title">Importar Planilha OS</div>
-          <div class="mob-upload-sub">.xlsx · .xls · .csv — Toque para selecionar</div>
-        </div>
-        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--text-3);flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      </div>
-    </div>
-
-    <!-- Mobile action buttons -->
-    <div class="mob-actions" id="mobActions" style="display:none;">
-      <button class="mob-action-btn btn-ghost" onclick="App.toggleCompactMode()" style="border-color:var(--card-border);">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-        <span id="mobCompactLbl">Compacto</span>
-      </button>
-      <button class="mob-action-btn" style="background:var(--card-bg);border-color:var(--card-border);color:var(--text-2);" onclick="App.openMobileFilterSheet()">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-        Filtros &amp; Exportar
-      </button>
-    </div>
-
-    <!-- KPIs -->
     <div id="kpiGrid" style="display:none;">
       <div class="kpi" style="--kc:var(--accent);">
         <div class="kpi-lbl">O.S. Validadas</div>
-        <div class="kpi-row"><div><div class="kpi-val" id="dashTotalOs">—</div><div class="kpi-sub">no período</div></div><canvas class="kpi-spark" id="spark0"></canvas></div>
+        <div class="kpi-row"><div><div class="kpi-val" id="dashTotalOs">—</div></div><canvas class="kpi-spark" id="spark0"></canvas></div>
       </div>
       <div class="kpi" style="--kc:var(--blue);">
         <div class="kpi-lbl">Técnicos Ativos</div>
-        <div class="kpi-row"><div><div class="kpi-val" id="dashActiveTechs">—</div><div class="kpi-sub">com produção</div></div><canvas class="kpi-spark" id="spark1"></canvas></div>
+        <div class="kpi-row"><div><div class="kpi-val" id="dashActiveTechs">—</div></div><canvas class="kpi-spark" id="spark1"></canvas></div>
       </div>
-      <div class="kpi" style="--kc:#8B5CF6;">
+      <div class="kpi" style="--kc:var(--purple);">
         <div class="kpi-lbl">Média / Técnico</div>
-        <div class="kpi-row"><div><div class="kpi-val" id="dashAvgTech">—</div><div class="kpi-sub">O.S. no mês</div></div><canvas class="kpi-spark" id="spark2"></canvas></div>
+        <div class="kpi-row"><div><div class="kpi-val" id="dashAvgTech">—</div></div><canvas class="kpi-spark" id="spark2"></canvas></div>
       </div>
       <div class="kpi" style="--kc:var(--green);">
         <div class="kpi-lbl">Polo Top</div>
-        <div class="kpi-row"><div><div class="kpi-val" id="dashTopBase" style="font-size:16px;letter-spacing:0;line-height:1.3;">—</div><div class="kpi-sub">maior média</div></div><span class="kpi-chip up" id="dashTopBadge" style="display:none;">▲</span></div>
+        <div class="kpi-row"><div><div class="kpi-val" id="dashTopBase" style="font-size:16px;">—</div></div><span class="kpi-chip up" id="dashTopBadge" style="display:none;">▲</span></div>
       </div>
-      <div class="kpi" style="--kc:var(--red);">
+      <div class="kpi" id="kpiCriticalBaseCard" style="--kc:var(--red);">
         <div class="kpi-lbl">Polo Crítico</div>
-        <div class="kpi-row"><div><div class="kpi-val" id="dashCriticalBase" style="font-size:16px;letter-spacing:0;line-height:1.3;">—</div><div class="kpi-sub">menor média</div></div><span class="kpi-chip dn" id="dashCritBadge" style="display:none;">▼</span></div>
+        <div class="kpi-row"><div><div class="kpi-val" id="dashCriticalBase" style="font-size:16px;">—</div></div><span class="kpi-chip dn" id="dashCritBadge" style="display:none;">▼</span></div>
       </div>
     </div>
 
-    <!-- Charts row -->
     <div id="analysisRow" style="display:none;">
       <div class="chart-card">
-        <div class="card-hdr">
-          <span class="card-hdr-title">Atendimentos por Dia</span>
-          <span id="chartMonthLabel" style="font-family:var(--mono);font-size:10px;color:var(--text-3);"></span>
-        </div>
+        <div class="card-hdr"><span class="card-hdr-title">Atendimentos por Dia</span><span id="chartMonthLabel"></span></div>
         <div class="chart-body"><canvas id="dailyChart"></canvas></div>
       </div>
       <div class="rank-card">
-        <div class="card-hdr">
-          <span class="card-hdr-title">Ranking de Técnicos</span>
-          <span id="rankTotal" style="font-family:var(--mono);font-size:10px;color:var(--text-3);"></span>
-        </div>
+        <div class="card-hdr"><span class="card-hdr-title">Ranking de Técnicos</span><span id="rankTotal"></span></div>
         <div class="rank-body" id="rankBody"></div>
       </div>
     </div>
 
-    <!-- Desktop top row (upload + filters) -->
     <div id="topRow">
       <div id="uploadZone">
         <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" onchange="App.parseFileWithWorker(event)">
-        <div class="up-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
+        <div class="up-icon">⬆️</div>
         <div class="up-title">Importar Planilha OS</div>
         <div class="up-sub">.xlsx · .xls · .csv</div>
       </div>
@@ -233,18 +110,9 @@
         <div class="filter-top">
           <span class="filter-lbl">Filtros da Matriz</span>
           <div class="btn-row">
-            <button class="btn btn-ghost" id="btnCompact" onclick="App.toggleCompactMode()">
-              <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-              Compacto
-            </button>
-            <button class="btn btn-outline" onclick="App.exportToExcel()">
-              <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Excel
-            </button>
-            <button class="btn btn-purple hidden" id="btnGeminiAnalyze" onclick="App.analyzeWithGemini()">
-              <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-              Analisar IA
-            </button>
+            <button class="btn btn-ghost" id="btnCompact" onclick="App.toggleCompactMode()">Compacto</button>
+            <button class="btn btn-outline" onclick="App.exportToExcel()">Excel</button>
+            <button class="btn btn-purple hidden" id="btnGeminiAnalyze" onclick="App.analyzeWithGemini()">Analisar IA</button>
           </div>
         </div>
         <div class="form-row">
@@ -253,63 +121,34 @@
             <label class="flbl">Tipo de Equipe</label>
             <select id="filterType" class="fctl" onchange="App.applyFilters()">
               <option value="ALL">Todos os Tipos</option>
-              <option value="INSTALAÇÃO CIDADE">Instalação Cidade</option>
-              <option value="TECNICO 12/36H">Plantão 12/36H</option>
+              <option value="AUXILIAR">Auxiliar</option>
+              <option value="CHEFE DE EQUIPE/ INSTALAÇÃO CIDADE.">Chefe de equipe/ Instalação cidade.</option>
+              <option value="CHEFE DE EQUIPE/ RURAL">Chefe de equipe/ Rural</option>
+              <option value="CHEFE DE EQUIPE/ TECNICO 12/36H">Chefe de equipe/ tecnico 12/36H</option>
               <option value="SUPORTE MOTO">Suporte Moto</option>
-              <option value="RURAL">Rural</option>
-              <option value="FAZ TUDO">Faz Tudo</option>
+              <option value="CHEFE DE EQUIPE/FAZ TUDO">Chefe de equipe/Faz tudo</option>
             </select>
           </div>
-          <button class="btn btn-accent" onclick="App.applyFilters()" style="align-self:end;padding:8px 20px;">Atualizar</button>
+          <button class="btn btn-accent" onclick="App.applyFilters()">Atualizar</button>
         </div>
       </div>
     </div>
 
-    <!-- Search -->
-    <div id="searchBar" style="display:none;">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
-      <input type="text" id="techSearchInput" placeholder="Buscar técnico..." oninput="App.filterMatrixBySearch()">
-      <button id="searchClear" onclick="App.clearSearch()">limpar</button>
-      <span id="searchCount" style="font-family:var(--mono);font-size:10px;color:var(--text-3);"></span>
-    </div>
-
-    <!-- City tabs -->
+    <div id="searchBar" style="display:none;"><input type="text" id="techSearchInput" placeholder="Buscar técnico..." oninput="App.filterMatrixBySearch()"><button id="searchClear" onclick="App.clearSearch()">limpar</button></div>
     <div id="cityTabsWrapper"><div id="cityTabsContainer" class="city-tabs"></div></div>
-
-    <!-- Legend -->
     <div id="legendBar">
-      <span class="leg-lbl">Performance:</span>
-      <span class="leg g">▲ Excelente</span>
-      <span class="leg b">◆ Bom</span>
-      <span class="leg y">● Mediano</span>
-      <span class="leg r">▼ Abaixo</span>
+      <span class="leg-lbl">Performance:</span><span class="leg g">▲ Excelente</span><span class="leg b">◆ Bom</span><span class="leg y">● Mediano</span><span class="leg r">▼ Abaixo</span>
     </div>
-
-    <!-- Matrix -->
     <div id="matrixSection"><div id="matrixWrapper"></div></div>
 
-    <!-- Gemini panel -->
-    <div id="geminiPanel">
-      <div class="gp-hdr">
-        <div class="gp-ttl">
-          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-          Análise Gemini 2.5 Flash
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span class="g-ts" id="geminiTimestamp"></span>
-          <button class="btn btn-ghost" style="padding:4px 9px;font-size:10px;" onclick="document.getElementById('geminiPanel').style.display='none'">Fechar</button>
-        </div>
-      </div>
+    <div id="geminiPanel" style="display:none;">
+      <div class="gp-hdr"><div class="gp-ttl">Análise Gemini 2.5 Flash</div><button class="btn btn-ghost" onclick="document.getElementById('geminiPanel').style.display='none'">Fechar</button></div>
       <div class="gp-body" id="geminiInsightContent"></div>
     </div>
-  </div><!-- /view-dashboard -->
+  </div>
 
-  <!-- ════ ANÁLISE ════ -->
   <div id="view-analise" class="view">
-    <div class="sec-hdr">
-      <div class="sec-eye">Inteligência Operacional</div>
-      <div class="sec-title">Análise Operacional</div>
-    </div>
+    <div class="sec-hdr"><div class="sec-eye">Inteligência Operacional</div><div class="sec-title">Panorama da Operação</div></div>
     <div id="analiseSection" style="display:block;">
       <div class="analise-grid" id="analiseCards">
         <div class="analise-card"><div class="analise-icon">📊</div><div class="analise-label">Eficiência Geral</div><div class="analise-value" id="aEfic">—</div><div class="analise-sub" id="aEficSub">—</div></div>
@@ -318,130 +157,85 @@
         <div class="analise-card"><div class="analise-icon">📅</div><div class="analise-label">Dia Mais Fraco</div><div class="analise-value" id="aWeakDay">—</div><div class="analise-sub" id="aWeakDaySub">—</div></div>
       </div>
       <div class="obs-grid">
-        <div class="obs-card">
-          <div class="obs-title"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>Destaque Positivos</div>
-          <div id="obsPositivos"><div class="empty" style="padding:16px;">Carregue dados.</div></div>
-        </div>
-        <div class="obs-card">
-          <div class="obs-title" style="color:var(--red);"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>Pontos de Atenção</div>
-          <div id="obsAtencao"><div class="empty" style="padding:16px;">Carregue dados.</div></div>
-        </div>
+        <div class="obs-card"><div class="obs-title">✨ Destaques Positivos & Auxiliares</div><div id="obsPositivos"><div class="empty">Carregue dados.</div></div></div>
+        <div class="obs-card"><div class="obs-title" style="color:var(--red);">⚠️ Pontos de Atenção</div><div id="obsAtencao"><div class="empty">Carregue dados.</div></div></div>
       </div>
       <div class="obs-grid" style="margin-top:12px;">
-        <div class="obs-card"><div class="obs-title">📋 Observações Rápidas</div><div id="obsRapidas"><div class="empty" style="padding:16px;">Carregue dados.</div></div></div>
-        <div class="obs-card"><div class="obs-title">💡 Sugestões de Melhoria</div><div id="obsSugestoes"><div class="empty" style="padding:16px;">Carregue dados.</div></div></div>
+        <div class="obs-card"><div class="obs-title">📋 Observações Rápidas</div><div id="obsRapidas"><div class="empty">Carregue dados.</div></div></div>
+        <div class="obs-card"><div class="obs-title">💡 Sugestões de Melhoria</div><div id="obsSugestoes"><div class="empty">Carregue dados.</div></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ════ PENDENTES ════ -->
   <div id="view-pendentes" class="view">
     <div class="sec-hdr"><div class="sec-eye">Gestão de Equipes</div><div class="sec-title">Novos Colaboradores</div></div>
-    <div class="dc">
-      <div class="dc-hdr"><span class="dc-ttl">Técnicos fora do cadastro que geraram O.S.</span></div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <table class="dtable">
-          <thead><tr><th>Nome</th><th>Total O.S.</th><th>Tipo Sugerido</th><th class="td-r">Ação</th></tr></thead>
-          <tbody id="pendentesTableBody"><tr><td colspan="4" class="empty">Faça o upload na aba Matriz.</td></tr></tbody>
-        </table>
-      </div>
+    <div class="dc"><div class="dc-hdr"><span class="dc-ttl">Técnicos fora do cadastro que geraram O.S.</span></div>
+      <table class="dtable"><thead><tr><th>Nome</th><th>Total O.S.</th><th>Tipo Sugerido</th><th class="td-r">Ação</th></tr></thead><tbody id="pendentesTableBody"><tr><td colspan="4" class="empty">Faça o upload na aba Matriz.</td></tr></tbody></table>
     </div>
   </div>
-
-  <!-- ════ RECLASSIFICAÇÃO ════ -->
   <div id="view-reclassificacao" class="view">
     <div class="sec-hdr"><div class="sec-eye">Inteligência Artificial</div><div class="sec-title">Reclassificação de Equipes</div></div>
-    <div class="dc">
-      <div class="dc-hdr"><span class="dc-ttl">Padrões detectados que divergem do tipo cadastrado</span></div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <table class="dtable">
-          <thead><tr><th>Colaborador</th><th>Tipo Atual</th><th style="color:var(--purple);">Tipo Sugerido</th><th class="td-r">Ação</th></tr></thead>
-          <tbody id="reclassifyTableBody"><tr><td colspan="4" class="empty">Nenhuma sugestão.</td></tr></tbody>
-        </table>
-      </div>
+    <div class="dc"><div class="dc-hdr"><span class="dc-ttl">Padrões detectados que divergem do tipo cadastrado</span></div>
+      <table class="dtable"><thead><tr><th>Colaborador</th><th>Tipo Atual</th><th style="color:var(--purple);">Tipo Sugerido</th><th class="td-r">Ação</th></tr></thead><tbody id="reclassifyTableBody"><tr><td colspan="4" class="empty">Nenhuma sugestão.</td></tr></tbody></table>
     </div>
   </div>
 
-  <!-- ════ CONFIG ════ -->
   <div id="view-config" class="view">
     <div class="sec-hdr"><div class="sec-eye">Configurações</div><div class="sec-title">Base de Equipes</div></div>
-    <div class="gcfg">
-      <div class="gcfg-top">
-        <div class="g-icon">🤖</div>
-        <div><div class="g-ttl">Integração Gemini 2.5 Flash</div><div class="g-sub">Análise automática via Google AI Studio</div></div>
-      </div>
-      <div style="display:flex;gap:11px;align-items:flex-end;flex-wrap:wrap;">
-        <div class="fgrp" style="flex:1;min-width:200px;">
-          <label class="flbl">Chave de API</label>
-          <input type="password" id="geminiApiKey" class="fctl" placeholder="AIza...">
-        </div>
-        <button class="btn btn-purple" onclick="App.saveGeminiKey()" style="height:44px;">Salvar Chave</button>
-      </div>
-      <div class="g-note">🔒 Armazenada apenas localmente · <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--purple);">aistudio.google.com</a></div>
-    </div>
+    
     <div class="cfg-grid">
       <div class="cfg-card">
         <div class="cfg-hdr"><span class="cfg-hdr-ttl">Metas Diárias</span></div>
         <div class="cfg-body">
-          <div class="meta-row"><div class="meta-lbl">Instalação Cidade</div><input type="number" id="cfgMetaDiaComercial" class="fctl" style="text-align:center;"></div>
-          <div class="meta-row"><div class="meta-lbl">Plantão 12×36</div><input type="number" id="cfgMetaDiaPlantao" class="fctl" style="text-align:center;"></div>
-          <div class="meta-row"><div class="meta-lbl">Suporte Moto</div><input type="number" id="cfgMetaDiaSuporte" class="fctl" style="text-align:center;"></div>
+          <p style="font-size:11px;color:var(--text-3);margin-bottom:15px;">*Auxiliares têm meta base de 0. Aos sábados a meta dos demais cai 50% automaticamente.</p>
+          <div class="meta-row"><div class="meta-lbl">Instalação Cidade</div><input type="number" id="cfgMetaDiaInstalacao" class="fctl" style="text-align:center;"></div>
           <div class="meta-row"><div class="meta-lbl">Rural</div><input type="number" id="cfgMetaDiaRural" class="fctl" style="text-align:center;"></div>
+          <div class="meta-row"><div class="meta-lbl">Técnico 12/36H</div><input type="number" id="cfgMetaDiaTecnico" class="fctl" style="text-align:center;"></div>
+          <div class="meta-row"><div class="meta-lbl">Suporte Moto</div><input type="number" id="cfgMetaDiaSuporte" class="fctl" style="text-align:center;"></div>
           <div class="meta-row"><div class="meta-lbl">Faz Tudo</div><input type="number" id="cfgMetaDiaFazTudo" class="fctl" style="text-align:center;"></div>
-          <button class="btn btn-accent" style="width:100%;margin-top:14px;min-height:44px;" onclick="App.saveGlobalSettings()">Salvar Metas</button>
+          <button class="btn btn-accent" style="width:100%;margin-top:14px;" onclick="App.saveGlobalSettings()">Salvar Metas</button>
         </div>
       </div>
+      
       <div class="cfg-card">
-        <div class="cfg-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;">
+        <div class="cfg-hdr" style="display:flex;align-items:center;justify-content:space-between;">
           <span class="cfg-hdr-ttl">Colaboradores</span>
           <div class="btn-row">
-            <input type="file" id="importTeamInput" accept=".json" class="hidden" onchange="App.importTeamData(event)">
-            <button class="btn btn-ghost" onclick="document.getElementById('importTeamInput').click()">Importar</button>
-            <button class="btn btn-ghost" onclick="App.exportTeamData()">Exportar</button>
-            <button class="btn btn-accent" onclick="App.openAddTechModal()" style="min-height:44px;">+ Cadastrar</button>
+            <button class="btn btn-ghost" onclick="App.exportTeamData()">Exportar BD</button>
+            <button class="btn btn-accent" onclick="App.openAddTechModal()">+ Cadastrar</button>
           </div>
-        </div>
-        <div style="padding:10px 12px;border-bottom:1px solid var(--card-border);display:flex;gap:9px;flex-wrap:wrap;">
-          <div class="srch-wrap" style="flex:1;min-width:160px;">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
-            <input type="text" id="searchTech" class="fctl" placeholder="Buscar colaborador..." onkeyup="App.filterTeamTable()">
-          </div>
-          <select id="filterTeamCity" class="fctl" style="width:180px;" onchange="App.filterTeamTable()">
-            <option value="ALL">Todas as Regionais</option>
-          </select>
         </div>
         <div class="team-scroll" id="teamListContainer"></div>
       </div>
     </div>
   </div>
 
-</div><!-- /main -->
+</div>
 
-<!-- ── MODAL ───────────────────────────────────────────────── -->
 <div id="techModal" onclick="if(event.target===this)App.closeTechModal()">
   <div class="modal-box">
     <div class="modal-title" id="modalTitle">Adicionar Colaborador</div>
     <div style="display:flex;flex-direction:column;gap:13px;">
-      <div class="fgrp"><label class="flbl">Nome Exato</label><input type="text" id="modTechName" class="fctl" style="text-transform:uppercase;"></div>
-      <div class="fgrp"><label class="flbl">Polo / Regional</label><input type="text" id="modTechCity" list="regionaisDatalist" class="fctl" placeholder="Ex: JIPARANA" style="text-transform:uppercase;"></div>
+      <div class="fgrp"><label class="flbl">Nome Exato</label><input type="text" id="modTechName" class="fctl"></div>
+      <div class="fgrp"><label class="flbl">Polo / Regional</label><input type="text" id="modTechCity" list="regionaisDatalist" class="fctl"></div>
       <div class="fgrp"><label class="flbl">Tipo de Equipe</label>
         <select id="modTechType" class="fctl">
-          <option value="INSTALAÇÃO CIDADE">Instalação Cidade</option>
-          <option value="TECNICO 12/36H">Plantão 12/36H</option>
+          <option value="AUXILIAR">Auxiliar</option>
+          <option value="CHEFE DE EQUIPE/ INSTALAÇÃO CIDADE.">Chefe de equipe/ Instalação cidade.</option>
+          <option value="CHEFE DE EQUIPE/ RURAL">Chefe de equipe/ Rural</option>
+          <option value="CHEFE DE EQUIPE/ TECNICO 12/36H">Chefe de equipe/ tecnico 12/36H</option>
           <option value="SUPORTE MOTO">Suporte Moto</option>
-          <option value="RURAL">Rural</option>
-          <option value="FAZ TUDO">Faz Tudo</option>
+          <option value="CHEFE DE EQUIPE/FAZ TUDO">Chefe de equipe/Faz tudo</option>
         </select>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="App.closeTechModal()" style="min-height:44px;flex:1;justify-content:center;">Cancelar</button>
-      <button class="btn btn-accent" onclick="App.saveTechForm()" style="min-height:44px;flex:1;justify-content:center;">Salvar</button>
+      <button class="btn btn-ghost" onclick="App.closeTechModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="App.saveTechForm()">Salvar</button>
     </div>
   </div>
 </div>
 
 <script src="js/bundle.js"></script>
-
 </body>
 </html>
