@@ -907,12 +907,6 @@ function renderAdvancedDailyChart() {
   const tickColor = dark ? '#9FBFE1' : '#7A8FA5';
   const gridColor = dark ? 'rgba(125, 169, 214, 0.15)' : 'rgba(125, 169, 214, 0.18)';
   const mobileChart = isMobile();
-  
-  // Garantir que o gráfico tenha espaço suficiente para mostrar todos os dias
-  const chartContainer = document.getElementById('dailyChart')?.parentElement;
-  if (chartContainer && !mobileChart) {
-    chartContainer.style.minHeight = '280px';
-  }
 
   state.dailyChartInstance = new Chart(canvas, {
     data: {
@@ -964,7 +958,7 @@ function renderAdvancedDailyChart() {
         x: {
           offset: true,
           ticks: {
-            autoSkip: false,
+            autoSkip: mobileChart,
             maxTicksLimit: mobileChart ? 8 : labels.length,
             padding: mobileChart ? 8 : 6,
             font: { family: 'DM Sans', size: mobileChart ? 10 : 9, weight: '700' },
